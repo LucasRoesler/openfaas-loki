@@ -9,20 +9,20 @@ import (
 	"strings"
 	"time"
 
-	"github.com/LucasRoesler/openfaas-loki/pkg"
-
-	"github.com/go-chi/chi"
-	"github.com/go-chi/chi/middleware"
-
-	"github.com/LucasRoesler/openfaas-loki/pkg/faas"
-	"github.com/LucasRoesler/openfaas-loki/pkg/loki"
-
-	"github.com/openfaas/faas-provider/logs"
-
 	log "github.com/sirupsen/logrus"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+
+	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/middleware"
+
+	"github.com/LucasRoesler/openfaas-loki/pkg"
+	"github.com/LucasRoesler/openfaas-loki/pkg/faas"
+	"github.com/LucasRoesler/openfaas-loki/pkg/handlers"
+	"github.com/LucasRoesler/openfaas-loki/pkg/loki"
+
+	"github.com/openfaas/faas-provider/logs"
 )
 
 func init() {
@@ -43,7 +43,6 @@ var rootCmd = &cobra.Command{
 	Version: pkg.Version,
 	Run: func(cmd *cobra.Command, args []string) {
 		configureLogging()
-		log.Debugln(pkg.Version)
 		log.WithFields(log.Fields(viper.AllSettings())).Debug("configuration")
 
 		client := loki.New(viper.GetString("url"))
@@ -51,8 +50,9 @@ var rootCmd = &cobra.Command{
 
 		routes := chi.NewRouter()
 		routes.Use(middleware.Recoverer)
-		routes.Use(middleware.Heartbeat("/health"))
-		routes.Get("/", logs.NewLogHandlerFunc(requester, viper.GetDuration("timeout")))
+		routes.Use(middleware.Heartbeat("/-/health"))
+		routes.Get("/-/config", handlers.ConfigHandlerFunc)
+		routes.Get("/system/logs", logs.NewLogHandlerFunc(requester, viper.GetDuration("timeout")))
 
 		srv := http.Server{
 			Addr:    ":" + viper.GetString("port"),

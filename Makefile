@@ -58,3 +58,12 @@ install: $(shell find ./pkg ./cmd) ## Build the project and store the binaries i
 		"-X ${.PKG}/pkg.GitCommit=${.GIT_COMMIT} -X ${.PKG}/pkg.Version=${.GIT_VERSION}" \
 		.
 
+
+.PHONY: build
+build:  ## Create a docker image using the binary from make build
+	DOCKER_BUILDKIT=1 docker build \
+		-t ${.IMAGE_PREFIX}:latest \
+		-t ${.IMAGE_PREFIX}:dev \
+		--build-arg GIT_COMMIT=${.GIT_COMMIT} \
+		--build-arg GIT_VERSION=${.GIT_VERSION} \
+		-f ./Dockerfile .

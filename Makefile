@@ -1,5 +1,4 @@
 .NAME := openfaas-loki
-.BIN_NAME := loki-provider
 .PKG := github.com/LucasRoesler/$(.NAME)
 .IMAGE_PREFIX=theaxer/$(.NAME)
 
@@ -35,18 +34,27 @@ changelog: ## Print git hitstory based changelog
 .PHONY: lint
 lint: ## Verifies `golint` passes
 	@echo "+ $@"
-	@golint -set_exit_status $(shell go list ./pkg/...)
+	@golint -set_exit_status $(shell go list ./pkg/... ./cmd/...)
 
 .PHONY: fmt
-fmt: $(shell find ./pkg) ## Verifies all files have been `gofmt`ed
+fmt: $(shell find ./pkg ./cmd) ## Verifies all files have been `gofmt`ed
 	@echo "+ $@"
 	@gofmt -s -l . | tee /dev/stderr
 
 .PHONY: .test-ci
 .test-ci:
 	@echo "+ test"
-	GO111MODULE=on go test -cover ./pkg/...
+	GO111MODULE=on go test -cover ./...
 
 .PHONY: test
-test: $(shell find ./pkg) lint  ## Runs the go tests
+test: $(shell find ./pkg ./cmd) lint  ## Runs the go tests
 	-@$(MAKE) .test-ci
+
+.PHONY: install
+install: $(shell find ./pkg ./cmd) ## Build the project and store the binaries in the GOPATH
+	@echo "+ install $(.NAME): $(.GIT_COMMIT)"
+	@CGO_ENABLED=0 go install \
+		-v -ldflags \
+		"-X ${.PKG}/pkg.GitCommit=${.GIT_COMMIT} -X ${.PKG}/pkg.Version=${.GIT_VERSION}" \
+		.
+

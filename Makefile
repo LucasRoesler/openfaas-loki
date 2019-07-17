@@ -41,14 +41,10 @@ fmt: $(shell find ./pkg ./cmd) ## Verifies all files have been `gofmt`ed
 	@echo "+ $@"
 	@gofmt -s -l . | tee /dev/stderr
 
-.PHONY: .test-ci
-.test-ci:
-	@echo "+ test"
-	GO111MODULE=on go test -cover ./...
-
 .PHONY: test
 test: $(shell find ./pkg ./cmd) lint  ## Runs the go tests
-	-@$(MAKE) .test-ci
+	@echo "+ test"
+	GO111MODULE=on go test -cover ./...
 
 .PHONY: install
 install: $(shell find ./pkg ./cmd) ## Build the project and store the binaries in the GOPATH

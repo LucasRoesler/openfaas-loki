@@ -2,7 +2,7 @@
 
 [![CircleCI](https://circleci.com/gh/LucasRoesler/openfaas-loki.svg?style=svg)](https://circleci.com/gh/LucasRoesler/openfaas-loki) [![Go Report Card](https://goreportcard.com/badge/github.com/LucasRoesler/openfaas-loki)](https://goreportcard.com/report/github.com/LucasRoesler/openfaas-loki)
 
-A [Loki](https://github.com/grafana/loki) powered log provider for OpenFaaS
+A [Loki](https://github.com/grafana/loki) powered log provider for [OpenFaaS](https://www.openfaas.com)
 
 
 ## Development flow

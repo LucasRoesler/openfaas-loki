@@ -1,5 +1,7 @@
 # OpenFaaS Loki Provider
 
+[![CircleCI](https://circleci.com/gh/LucasRoesler/openfaas-loki.svg?style=svg)](https://circleci.com/gh/LucasRoesler/openfaas-loki)
+
 ## Development flow
 OpenFaaS Loki is built with go 1.12+ and uses go modules
 

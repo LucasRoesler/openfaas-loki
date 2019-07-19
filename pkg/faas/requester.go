@@ -3,9 +3,9 @@ package faas
 import (
 	"context"
 	"fmt"
+	"strconv"
+	"strings"
 	"sync"
-
-	"github.com/prometheus/prometheus/promql"
 
 	"github.com/pkg/errors"
 
@@ -96,18 +96,33 @@ func (l *lokiRequester) sendEntries(ctx context.Context, logStream chan logs.Mes
 	}
 }
 
-// parseLabels uses the prometheus labels parser to convert the labels into a map
+// parseLabels parse the output of Labels.String from
+// from prometheus https://github.com/prometheus/prometheus/blob/8624913a3489f28a173f5c6e49a8a762785ae2c0/pkg/labels/labels.go#L49
+// because this is currently the format sen back by Loki
+// parsing errors are quiently skipped
 func parseLabels(value string) map[string]string {
-	ls, err := promql.ParseMetric(value)
-	if err != nil {
-		logrus.
-			WithField("method", "parseLabels").
-			WithField("value", value).
-			Error(err)
-		return nil
+	log := logrus.WithField("method", "parseLabels")
+
+	parsed := map[string]string{}
+
+	labelCSV := strings.Trim(value, "{}")
+	labels := strings.Split(labelCSV, ",")
+	for _, label := range labels {
+		parts := strings.SplitN(strings.TrimSpace(label), "=", 2)
+		if len(parts) != 2 {
+			log.WithField("label", label).Error("unexpected number of label parts")
+			continue
+		}
+
+		value, err := strconv.Unquote(parts[1])
+		if err != nil {
+			log.WithField("label", label).Error(errors.Wrap(err, "failed to unquote label value"))
+			continue
+		}
+		parsed[parts[0]] = value
 	}
 
-	return ls.Map()
+	return parsed
 }
 
 // parseEntry

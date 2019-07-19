@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
 
 	"github.com/pkg/errors"
 
@@ -15,7 +16,8 @@ import (
 )
 
 const (
-	queryPath = "/api/prom/query?query=%s&limit=%d&start=%d&end=%d&direction=%s&regexp=%s"
+	// queryPath = "/api/prom/query?query=%s&limit=%d&start=%d&end=%d&direction=%s&regexp=%s"
+	queryPath = "/api/prom/query?%s"
 )
 
 // Client is an API client for Loki
@@ -39,15 +41,8 @@ func New(base string) Client {
 }
 
 func (c *httpClient) Query(ctx context.Context, req logproto.QueryRequest) (*logproto.QueryResponse, error) {
-	path := fmt.Sprintf(
-		queryPath,
-		url.QueryEscape(req.Query),
-		req.Limit,
-		req.Start.UnixNano(),
-		req.End.UnixNano(),
-		req.Direction.String(),
-		req.Regex,
-	)
+	params := requestAsQueryParms(req)
+	path := fmt.Sprintf(queryPath, params.Encode())
 
 	var resp logproto.QueryResponse
 	err := c.doRequest(ctx, path, &resp)
@@ -89,4 +84,28 @@ func (c *httpClient) doRequest(ctx context.Context, path string, out interface{}
 
 func isOK(s int) bool {
 	return s/100 == 2
+}
+
+func requestAsQueryParms(req logproto.QueryRequest) (params url.Values) {
+	params = url.Values{}
+	params.Add("query", req.Query)
+	params.Add("direction", req.GetDirection().String())
+
+	if req.Limit > 0 {
+		params.Add("limit", strconv.Itoa(int(req.Limit)))
+	}
+
+	if req.Regex != "" {
+		params.Add("regexp", req.Regex)
+	}
+
+	if !req.GetStart().IsZero() {
+		params.Add("start", strconv.Itoa(int(req.Start.UnixNano())))
+	}
+
+	if !req.GetEnd().IsZero() {
+		params.Add("end", strconv.Itoa(int(req.End.UnixNano())))
+	}
+
+	return params
 }

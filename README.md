@@ -1,6 +1,6 @@
 # OpenFaaS Loki Provider
 
-[![CircleCI](https://circleci.com/gh/LucasRoesler/openfaas-loki.svg?style=svg)](https://circleci.com/gh/LucasRoesler/openfaas-loki) [![Go Report Card](https://goreportcard.com/badge/github.com/LucasRoesler/openfaas-loki)](https://goreportcard.com/report/github.com/LucasRoesler/openfaas-loki)
+[![CircleCI](https://circleci.com/gh/LucasRoesler/openfaas-loki.svg?style=svg)](https://circleci.com/gh/LucasRoesler/openfaas-loki) [![Go Report Card](https://goreportcard.com/badge/github.com/LucasRoesler/openfaas-loki)](https://goreportcard.com/report/github.com/LucasRoesler/openfaas-loki) [![Docker](https://img.shields.io/docker/pulls/theaxer/openfaas-loki.svg)](https://cloud.docker.com/repository/docker/theaxer/openfaas-loki)
 
 A [Loki](https://github.com/grafana/loki) powered log provider for [OpenFaaS](https://www.openfaas.com)
 

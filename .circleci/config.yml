@@ -24,5 +24,3 @@ jobs:
           key: go-mod-cache
           paths:
             - "/go/pkg/mod"
-      - store_test_results:
-          path: /tmp/test-results

@@ -1,6 +1,9 @@
 # OpenFaaS Loki Provider
 
-[![CircleCI](https://circleci.com/gh/LucasRoesler/openfaas-loki.svg?style=svg)](https://circleci.com/gh/LucasRoesler/openfaas-loki)
+[![CircleCI](https://circleci.com/gh/LucasRoesler/openfaas-loki.svg?style=svg)](https://circleci.com/gh/LucasRoesler/openfaas-loki) [![Go Report Card](https://goreportcard.com/badge/github.com/LucasRoesler/openfaas-loki)](https://goreportcard.com/report/github.com/LucasRoesler/openfaas-loki)
+
+A [Loki](https://github.com/grafana/loki) powered log provider for OpenFaaS
+
 
 ## Development flow
 OpenFaaS Loki is built with go 1.12+ and uses go modules

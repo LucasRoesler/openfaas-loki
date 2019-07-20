@@ -1,0 +1,4 @@
+1. Update your OpenFaaS gateway installation to include the environment variable
+
+  - name: logs_provider_url
+    value: http://{{ template "openfaas-loki.fullname" . }}.{{ .Release.Namespace }}:{{ .Values.service.port }}/

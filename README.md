@@ -4,6 +4,24 @@
 
 A [Loki](https://github.com/grafana/loki) powered log provider for [OpenFaaS](https://www.openfaas.com)
 
+## Install with Helm
+
+```sh
+helm upgrade --install ofloki ./deployment/openfaas-loki \
+    --namespace openfaas \
+    --set lokiURL=http://loki.monitoring:3100 \
+    --set logLevel=DEBUG
+```
+
+Then update the gateway with the environment variable described in the NOTES output of the helm install.
+
+Test the installation using
+
+```sh
+faas-cli store deploy nodeinfo
+echo "" | faas-cli invoke nodeinfo
+faas-cli logs nodeinfo --tail=3
+```
 
 ## Development flow
 OpenFaaS Loki is built with go 1.12+ and uses go modules
@@ -30,12 +48,12 @@ openfaas-loki --version
 
 
 ### Build Docker
-To enable efficient builds, the Dockerfile uses the experimental RUN syntax to support build-time cahces. This requires enabling the "experimental" features in your Docker installation.  This will enable using [buildkit as the build engine](https://github.com/moby/buildkit/blob/master/frontend/dockerfile/docs/experimental.md#run---mounttypecache)
+To enable efficient builds, the Dockerfile uses the experimental RUN syntax to support build-time caches. This requires enabling the "experimental" features in your Docker installation.  This will enable using [buildkit as the build engine](https://github.com/moby/buildkit/blob/master/frontend/dockerfile/docs/experimental.md#run---mounttypecache)
 
 Build the Docker image and verify the build using
 
 ```sh
 make build
-docker run theaxer/openfaas-loki:latest --version
+docker run theaxer/openfaas-loki:dev --version
 ```
 

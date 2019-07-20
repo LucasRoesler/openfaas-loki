@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "openfaas-loki.fullname" . }}
+  labels:
+    app: {{ template "openfaas-loki.name" . }}
+    chart: {{ template "openfaas-loki.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ template "openfaas-loki.name" . }}
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "openfaas-loki.name" . }}
+        release: {{ .Release.Name }}
+    spec:
+      containers:
+        - name: provider
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          securityContext:
+            readOnlyRootFilesystem: true
+            runAsUser: 10001
+          env:
+            - name: OF_LOKI_URL
+              value: {{ .Values.lokiURL | quote }}
+            - name: OF_LOKI_LOG_LEVEL
+              value: {{ .Values.logLevel | quote }}
+            - name: OF_LOKI_TIMEOUT
+              value: {{ .Values.timeout | quote }}
+          ports:
+            - name: http
+              containerPort: 9191
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /-/health
+              port: http
+              scheme: HTTP
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /-/health
+              port: http
+              scheme: HTTP
+            timeoutSeconds: 5
+            failureThreshold: 3
+          resources:
+{{ toYaml .Values.resources | indent 12 }}
+    {{- with .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}

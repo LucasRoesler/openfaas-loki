@@ -102,7 +102,7 @@ func (l *lokiRequester) sendEntries(ctx context.Context, logStream chan logs.Mes
 // parsing errors are quiently skipped
 func parseLabels(value string) map[string]string {
 	log := logrus.WithField("method", "parseLabels")
-
+	log.Debug(value)
 	parsed := map[string]string{}
 
 	labelCSV := strings.Trim(value, "{}")
@@ -129,6 +129,7 @@ func parseLabels(value string) map[string]string {
 func parseEntry(entry logproto.Entry, labels map[string]string) logs.Message {
 	return logs.Message{
 		Name:      labels["faas_function"],
+		Instance:  labels["instance"],
 		Timestamp: entry.Timestamp,
 		Text:      entry.Line,
 	}

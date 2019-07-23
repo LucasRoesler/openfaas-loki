@@ -24,7 +24,7 @@ All other OpenFaaS log behaviors should be fully supported. [Issues are welcome]
     ```
 4. Then update the `gateway` with the environment variable described in the NOTES output of the helm install. Currently, this can be done using
     ```sh
-    kubectl edit deploy/gateway
+    kubectl -n openfaas set env deployment/gateway -c gateway -e logs_provider_url=http://ofloki-openfaas-loki.openfaas:9191/
     ```
     The environment variable is only needed on the `gateway` container.
 5. Test the installation using

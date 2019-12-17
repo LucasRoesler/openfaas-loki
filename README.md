@@ -17,7 +17,7 @@ All other OpenFaaS log behaviors should be fully supported. [Issues are welcome]
 2. Determine the URL of your Loki installation, if you used the default Helm values to install Loki, this will be `http://<service name>.<namespace>:3100`
 3. Then install the `openfaas-loki` provider using Helm:
     ```sh
-    helm upgrade --install ofloki ./deployment/openfaas-loki \
+    helm upgrade --install ofloki ./chart/openfaas-loki \
         --namespace openfaas \
         --set lokiURL=http://loki.monitoring:3100 \
         --set logLevel=DEBUG

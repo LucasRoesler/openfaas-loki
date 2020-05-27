@@ -42,7 +42,7 @@ fmt: $(shell find ./pkg ./cmd) ## Verifies all files have been `gofmt`ed
 	@gofmt -s -l . | tee /dev/stderr
 
 .PHONY: test
-test: $(shell find ./pkg ./cmd) lint  ## Runs the go tests
+test: $(shell find ./pkg ./cmd)  ## Runs the go tests
 	@echo "+ test"
 	GO111MODULE=on go test -race -cover ./...
 

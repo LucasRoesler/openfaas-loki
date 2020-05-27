@@ -44,7 +44,7 @@ func (l *lokiRequester) Query(ctx context.Context, req logs.Request) (<-chan log
 	for _, stream := range resp.Streams {
 		log.Debug("starting stream")
 		wg.Add(1)
-		go func(s *logproto.Stream) {
+		go func(s logproto.Stream) {
 			defer wg.Done()
 			// TODO: is this safe, since stream is []*logproto.Stream?
 			l.sendEntries(ctx, logStream, s)
@@ -70,22 +70,17 @@ func (l *lokiRequester) buildRequest(logReq logs.Request) (req logproto.QueryReq
 	}
 
 	if logReq.Instance != "" {
-		req.Query = fmt.Sprintf("{faas_function=\"%s\",instance=\"%s\"}", logReq.Name, logReq.Instance)
+		req.Selector = fmt.Sprintf("{faas_function=\"%s\",instance=\"%s\"}", logReq.Name, logReq.Instance)
 	} else {
-		req.Query = fmt.Sprintf("{faas_function=\"%s\"}", logReq.Name)
+		req.Selector = fmt.Sprintf("{faas_function=\"%s\"}", logReq.Name)
 	}
 	logrus.WithField("method", "buildRequest").Debugf("%v => %v", logReq, req)
 	return req
 }
 
 // sendEntries will parse the stream entries and push them into the log stream channel
-func (l *lokiRequester) sendEntries(ctx context.Context, logStream chan logs.Message, stream *logproto.Stream) {
+func (l *lokiRequester) sendEntries(ctx context.Context, logStream chan logs.Message, stream logproto.Stream) {
 	log := logrus.WithField("method", "sendEntries")
-	if stream == nil {
-		log.Debug("received nil stream")
-		return
-	}
-
 	labels := parseLabels(stream.Labels)
 	for _, entry := range stream.Entries {
 		if ctx.Err() != nil {

@@ -28,32 +28,27 @@ func Test_RequestConstruction(t *testing.T) {
 	}{
 		{
 			"query value only",
-			logproto.QueryRequest{Query: "test"},
+			logproto.QueryRequest{Selector: "test"},
 			expectedQueryParmas{query: "test", direction: forward},
 		},
 		{
 			"query with limit",
-			logproto.QueryRequest{Query: "test", Limit: 3},
+			logproto.QueryRequest{Selector: "test", Limit: 3},
 			expectedQueryParmas{query: "test", direction: forward, limit: "3"},
 		},
 		{
 			"query with start",
-			logproto.QueryRequest{Query: "test", Start: now},
+			logproto.QueryRequest{Selector: "test", Start: now},
 			expectedQueryParmas{query: "test", direction: forward, start: nowUnix},
 		},
 		{
 			"query with end equal now",
-			logproto.QueryRequest{Query: "test", End: now},
+			logproto.QueryRequest{Selector: "test", End: now},
 			expectedQueryParmas{query: "test", direction: forward, end: nowUnix},
 		},
 		{
-			"query with regex",
-			logproto.QueryRequest{Query: "test", Regex: "^abc$"},
-			expectedQueryParmas{query: "test", direction: forward, regexp: "^abc$"},
-		},
-		{
 			"query with backward direction",
-			logproto.QueryRequest{Query: "test", Direction: logproto.BACKWARD},
+			logproto.QueryRequest{Selector: "test", Direction: logproto.BACKWARD},
 			expectedQueryParmas{query: "test", direction: backward},
 		},
 	}

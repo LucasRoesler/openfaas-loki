@@ -88,15 +88,11 @@ func isOK(s int) bool {
 
 func requestAsQueryParms(req logproto.QueryRequest) (params url.Values) {
 	params = url.Values{}
-	params.Add("query", req.Query)
+	params.Add("query", req.Selector)
 	params.Add("direction", req.GetDirection().String())
 
 	if req.Limit > 0 {
 		params.Add("limit", strconv.Itoa(int(req.Limit)))
-	}
-
-	if req.Regex != "" {
-		params.Add("regexp", req.Regex)
 	}
 
 	if !req.GetStart().IsZero() {

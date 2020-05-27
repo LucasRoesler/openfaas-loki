@@ -36,7 +36,7 @@ func Test_QueryWithInvalidLabels(t *testing.T) {
 	lokiClient := mockLokiClient{
 		labels: map[string]string{"somethingelse": "and more"},
 		entries: []logproto.Entry{
-			{now, "test message0"},
+			{Timestamp: now, Line: "test message0"},
 		},
 	}
 	requester := New(&lokiClient)
@@ -63,9 +63,9 @@ func Test_QueryHappyPath(t *testing.T) {
 	lokiClient := mockLokiClient{
 		labels: map[string]string{"faas_function": "testFnc"},
 		entries: []logproto.Entry{
-			{now, "test message0"},
-			{now.Add(time.Second), "test message1"},
-			{now.Add(2 * time.Second), "test message2"},
+			{Timestamp: now, Line: "test message0"},
+			{Timestamp: now.Add(time.Second), Line: "test message1"},
+			{Timestamp: now.Add(2 * time.Second), Line: "test message2"},
 		},
 	}
 	requester := New(&lokiClient)
@@ -106,8 +106,8 @@ func (c *mockLokiClient) Query(ctx context.Context, req logproto.QueryRequest) (
 	labels := fmt.Sprintf("{%s}", strings.TrimRight(b.String(), ","))
 
 	resp := &logproto.QueryResponse{
-		Streams: []*logproto.Stream{
-			&logproto.Stream{Labels: labels, Entries: c.entries},
+		Streams: []logproto.Stream{
+			{Labels: labels, Entries: c.entries},
 		},
 	}
 	return resp, nil

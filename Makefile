@@ -1,6 +1,7 @@
 .NAME := openfaas-loki
 .PKG := github.com/LucasRoesler/$(.NAME)
 .IMAGE_PREFIX=theaxer/$(.NAME)
+.TAG=latest
 
 .GIT_COMMIT=$(shell git rev-parse HEAD)
 .GIT_VERSION=$(shell git describe --tags 2>/dev/null || echo "$(.GIT_COMMIT)")
@@ -63,12 +64,12 @@ build: $(addprefix build-,$(ARCHS))  ## Build Docker images for all architecture
 .PHONY: build-%
 build-%:
 	DOCKER_BUILDKIT=1 docker build $(BUILD_ARGS) --build-arg go_opts="GOARCH=$*" \
-		-t ${.IMAGE_PREFIX}:latest-$* \
+		-t ${.IMAGE_PREFIX}:${.TAG}-$* \
 		-f ./Dockerfile .
 
 build-armhf:
 	DOCKER_BUILDKIT=1 docker build $(BUILD_ARGS) --build-arg go_opts="GOARCH=arm GOARM=6" \
-		-t ${.IMAGE_PREFIX}:latest-armhf \
+		-t ${.IMAGE_PREFIX}:${.TAG}-armhf \
 		-f ./Dockerfile .
 
 .PHONY: push
@@ -76,21 +77,21 @@ push: $(addprefix push-,$(ARCHS)) ## Push Docker images for all architectures
 
 .PHONY: push-%
 push-%:
-	docker push ${.IMAGE_PREFIX}:latest-$*
+	docker push ${.IMAGE_PREFIX}:${.TAG}-$*
 
 .PHONY: manifest
 manifest: ## Create and push Docker manifest to combine all architectures in multi-arch Docker image
-	docker manifest create --amend ${.IMAGE_PREFIX}:latest $(addprefix ${.IMAGE_PREFIX}:latest-,$(ARCHS))
+	docker manifest create --amend ${.IMAGE_PREFIX}:${.TAG} $(addprefix ${.IMAGE_PREFIX}:${.TAG}-,$(ARCHS))
 	$(MAKE) $(addprefix manifest-annotate-,$(ARCHS))
-	docker manifest push -p ${.IMAGE_PREFIX}:latest
+	docker manifest push -p ${.IMAGE_PREFIX}:${.TAG}
 
 .PHONY: manifest-annotate-%
 manifest-annotate-%:
-	docker manifest annotate ${.IMAGE_PREFIX}:latest ${.IMAGE_PREFIX}:latest-$* --os linux --arch $*
+	docker manifest annotate ${.IMAGE_PREFIX}:${.TAG} ${.IMAGE_PREFIX}:${.TAG}-$* --os linux --arch $*
 
 .PHONY: manifest-annotate-armhf
 manifest-annotate-armhf:
-	docker manifest annotate ${.IMAGE_PREFIX}:latest ${.IMAGE_PREFIX}:latest-armhf --os linux --arch arm --variant v6
+	docker manifest annotate ${.IMAGE_PREFIX}:${.TAG} ${.IMAGE_PREFIX}:${.TAG}-armhf --os linux --arch arm --variant v6
 
 .PHONY: package
 package:  ## Package the helm chart

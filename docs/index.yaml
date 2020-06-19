@@ -1,0 +1,16 @@
+apiVersion: v1
+entries:
+  openfaas-loki:
+  - apiVersion: v1
+    appVersion: 0.0.1
+    created: "2020-06-19T20:15:03.330945+02:00"
+    description: A Loki powered log provider for OpenFaaS
+    digest: 5348bd79bf6577dd1ece1ba1c1427f3b16e865adceab201f02f6533293fe245a
+    maintainers:
+    - name: Lucas Roesler
+      url: https://lucasroesler.com
+    name: openfaas-loki
+    urls:
+    - openfaas-loki-0.1.0.tgz
+    version: 0.1.0
+generated: "2020-06-19T20:15:03.328297+02:00"

@@ -63,3 +63,11 @@ build:  ## Create a docker image using the binary from make build
 		--build-arg GIT_COMMIT=${.GIT_COMMIT} \
 		--build-arg GIT_VERSION=${.GIT_VERSION} \
 		-f ./Dockerfile .
+
+
+
+.PHONY: package
+package:  ## Package the helm chart
+	@echo "+ helm package"
+	helm package chart/openfaas-loki -d docs/
+	helm repo index ./docs

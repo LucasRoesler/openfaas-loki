@@ -11,7 +11,7 @@ ifneq ($(.GIT_UNTRACKEDCHANGES),)
 endif
 
 ARCHS=amd64 arm64 armhf ppc64le
-BUILD_ARGS=--build-arg GIT_COMMIT=$(.GIT_COMMIT) --build-arg GIT_VERSION=$(.GIT_VERSION)g
+BUILD_ARGS=--build-arg GIT_COMMIT=$(.GIT_COMMIT) --build-arg GIT_VERSION=$(.GIT_VERSION)
 
 ################################
 ################################

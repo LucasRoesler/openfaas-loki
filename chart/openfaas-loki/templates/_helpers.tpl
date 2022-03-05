@@ -25,6 +25,15 @@ If release name contains chart name it will be used as a full name.
 {{- end -}}
 
 {{/*
+Common annotations
+*/}}
+{{- define "openfaas-loki.annotations" -}}
+{{- with .Values.annotations }}
+{{- toYaml . }}
+{{- end }}
+{{- end }}
+
+{{/*
 Create chart name and version as used by the chart label.
 */}}
 {{- define "openfaas-loki.chart" -}}

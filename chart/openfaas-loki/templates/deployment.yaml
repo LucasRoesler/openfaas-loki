@@ -2,6 +2,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ template "openfaas-loki.fullname" . }}
+  annotations:
+    {{- include "openfaas-loki.annotations" . | nindent 4 }}    
   labels:
     app: {{ template "openfaas-loki.name" . }}
     chart: {{ template "openfaas-loki.chart" . }}

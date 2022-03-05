@@ -9,8 +9,7 @@ import (
 	"strconv"
 
 	"github.com/pkg/errors"
-
-	"github.com/sirupsen/logrus"
+	"github.com/rs/zerolog/log"
 
 	"github.com/grafana/loki/pkg/logproto"
 )
@@ -54,7 +53,7 @@ func (c *httpClient) Query(ctx context.Context, req logproto.QueryRequest) (*log
 }
 
 func (c *httpClient) doRequest(ctx context.Context, path string, out interface{}) error {
-	log := logrus.WithField("method", "doRequest")
+	logger := log.With().Str("method", "doRequest").Logger()
 
 	req, err := http.NewRequest("GET", c.lokiBaseURL+path, nil)
 	if err != nil {
@@ -62,7 +61,7 @@ func (c *httpClient) doRequest(ctx context.Context, path string, out interface{}
 	}
 	req = req.WithContext(ctx)
 
-	log.Debug(req.URL.String())
+	logger.Debug().Msg(req.URL.String())
 
 	resp, err := c.parent.Do(req)
 	if err != nil {
@@ -71,7 +70,7 @@ func (c *httpClient) doRequest(ctx context.Context, path string, out interface{}
 	defer func() {
 		err := resp.Body.Close()
 		if err != nil {
-			log.Errorf("error closing body: %s", err)
+			logger.Error().Err(err).Msg("error closing body")
 		}
 	}()
 

@@ -3,13 +3,15 @@ package cmd
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
 	"strings"
 	"time"
 
-	log "github.com/sirupsen/logrus"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -20,6 +22,7 @@ import (
 	"github.com/LucasRoesler/openfaas-loki/pkg"
 	"github.com/LucasRoesler/openfaas-loki/pkg/faas"
 	"github.com/LucasRoesler/openfaas-loki/pkg/handlers"
+	"github.com/LucasRoesler/openfaas-loki/pkg/http/middlewares"
 	"github.com/LucasRoesler/openfaas-loki/pkg/loki"
 
 	"github.com/openfaas/faas-provider/logs"
@@ -28,6 +31,7 @@ import (
 //nolint:gochecknoinits // cobra is initialized in init()
 func init() {
 	rootCmd.Flags().String("log-level", "INFO", "Logging level")
+	rootCmd.Flags().String("log-fmt", "logfmt", "Logging output format: logfmt|json")
 	rootCmd.Flags().Int("port", 9191, "address the HTTP server will be listening to")
 	rootCmd.Flags().Duration("timeout", 30*time.Second, "log request timeout")
 	rootCmd.Flags().String("url", "", "base url of the Loki API")
@@ -38,20 +42,24 @@ func init() {
 	_ = viper.BindPFlags(rootCmd.Flags())
 }
 
+const healthEndpoint = "/-/health"
+
 var rootCmd = &cobra.Command{
 	Use:     "openfaas-loki",
 	Short:   "openfaas-loki is a log provider for openfaas, powered by loki",
 	Version: pkg.Version,
 	Run: func(cmd *cobra.Command, args []string) {
 		configureLogging()
-		log.WithFields(log.Fields(viper.AllSettings())).Debug("configuration")
+
+		log.Debug().Interface("config", viper.AllSettings()).Msg("configuration")
 
 		client := loki.New(viper.GetString("url"))
 		requester := faas.New(client)
 
 		routes := chi.NewRouter()
+		routes.Use(middlewares.RequestLogger([]string{healthEndpoint}))
 		routes.Use(middleware.Recoverer)
-		routes.Use(middleware.Heartbeat("/-/health"))
+		routes.Use(middleware.Heartbeat(healthEndpoint))
 		routes.Get("/-/config", handlers.ConfigHandlerFunc)
 		routes.Get("/system/logs", logs.NewLogHandlerFunc(requester, viper.GetDuration("timeout")))
 
@@ -82,7 +90,7 @@ var rootCmd = &cobra.Command{
 		err := srv.ListenAndServe()
 		if !errors.Is(err, http.ErrServerClosed) {
 			// Error starting or closing listener:
-			log.Error(err)
+			log.Error().Err(err).Send()
 		}
 
 		<-idleConnsClosed
@@ -91,16 +99,30 @@ var rootCmd = &cobra.Command{
 }
 
 func configureLogging() {
-	lvl, err := log.ParseLevel(viper.GetString("log-level"))
+	lvl, err := zerolog.ParseLevel(viper.GetString("log-level"))
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal().Err(err).Send()
 	}
-	log.SetLevel(lvl)
+	zerolog.SetGlobalLevel(lvl)
+
+	if viper.GetString("log-fmt") == "logfmt" {
+		setLogFormat()
+	}
+}
+
+// SetLogFormat configures the looger to use logfmt formatting.
+func setLogFormat() {
+	output := zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: time.RFC3339}
+	output.FormatLevel = func(i interface{}) string {
+		return strings.ToUpper(fmt.Sprintf("%s", i))
+	}
+	log.Logger = log.Output(output)
+	zerolog.DurationFieldUnit = time.Second
 }
 
 // Execute starts the openfaas-loki server
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
-		log.Fatal(err)
+		log.Fatal().Err(err).Send()
 	}
 }

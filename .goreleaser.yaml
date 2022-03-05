@@ -1,0 +1,33 @@
+# This is an example .goreleaser.yml file with some sensible defaults.
+# Make sure to check the documentation at https://goreleaser.com
+project_name: openfaas-loki
+builds:
+  - env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+    flags:
+      - -v
+    tags:
+      - osusergo
+      - netgo
+      - static
+    goarch:
+      - amd64
+      - arm64
+      - ppc64le
+    main: ./main.go
+    ldflags:
+      - -s -w
+      - -X github.com/LucasRoesler/openfaas-loki/pkg/cmd.GitCommit={{.Commit}}
+      - -X github.com/LucasRoesler/openfaas-loki/pkg/cmd.Version={{.Version}}
+archives:
+  - format: binary
+checksum:
+  name_template: "checksums.txt"
+snapshot:
+  name_template: "{{ incpatch .Version }}-next"
+changelog:
+  skip: true
+announce:
+  skip: true

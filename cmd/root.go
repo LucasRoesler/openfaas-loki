@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"net/http"
 	"os"
 	"os/signal"
@@ -25,6 +25,7 @@ import (
 	"github.com/openfaas/faas-provider/logs"
 )
 
+//nolint:gochecknoinits // cobra is initialized in init()
 func init() {
 	rootCmd.Flags().String("log-level", "INFO", "Logging level")
 	rootCmd.Flags().Int("port", 9191, "address the HTTP server will be listening to")
@@ -34,7 +35,7 @@ func init() {
 	viper.SetEnvPrefix("OF_LOKI")
 	viper.SetEnvKeyReplacer(strings.NewReplacer("-", "_"))
 	viper.AutomaticEnv()
-	viper.BindPFlags(rootCmd.Flags())
+	_ = viper.BindPFlags(rootCmd.Flags())
 }
 
 var rootCmd = &cobra.Command{
@@ -79,7 +80,7 @@ var rootCmd = &cobra.Command{
 
 		log.Printf("starting server at %v\n", srv.Addr)
 		err := srv.ListenAndServe()
-		if err != http.ErrServerClosed {
+		if !errors.Is(err, http.ErrServerClosed) {
 			// Error starting or closing listener:
 			log.Error(err)
 		}
@@ -100,7 +101,6 @@ func configureLogging() {
 // Execute starts the openfaas-loki server
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		log.Fatal(err)
 	}
 }

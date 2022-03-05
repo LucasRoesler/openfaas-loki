@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/LucasRoesler/openfaas-loki/pkg"
+	"github.com/sirupsen/logrus"
 
 	"github.com/spf13/viper"
 )
@@ -21,5 +22,8 @@ func ConfigHandlerFunc(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Write(bytes)
+	_, err = w.Write(bytes)
+	if err != nil {
+		logrus.WithError(err).Error("can not write config")
+	}
 }

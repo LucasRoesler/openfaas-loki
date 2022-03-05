@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: {{ template "openfaas-loki.fullname" . }}
   annotations:
-    {{- include "openfaas-loki.annotations" . | nindent 4 }}    
+    {{- include "openfaas-loki.annotations" . | nindent 4 }}
   labels:
     app: {{ template "openfaas-loki.name" . }}
     chart: {{ template "openfaas-loki.chart" . }}
@@ -23,7 +23,7 @@ spec:
     spec:
       containers:
         - name: provider
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          image: "{{ .Values.image.repository }}:{{ default .Chart.AppVersion .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           securityContext:
             readOnlyRootFilesystem: true

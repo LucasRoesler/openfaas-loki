@@ -16,8 +16,8 @@ jobs:
           release-type: go
           package-name: ""
           extra-files: |
-            chart/Chart.yaml
-            chart/values.yaml
+            chart/openfaas-loki/Chart.yaml
+            chart/openfaas-loki/values.yaml
           changelog-types: |
             [
               {"type":"feat","section":"Features","hidden":false},

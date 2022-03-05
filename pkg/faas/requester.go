@@ -84,7 +84,7 @@ func (l *lokiRequester) sendEntries(ctx context.Context, logStream chan logs.Mes
 	labels := parseLabels(stream.Labels)
 	for _, entry := range stream.Entries {
 		if ctx.Err() != nil {
-			log.Debug("context cancelled, stopping stream")
+			log.Debug("context canceled, stopping stream")
 			return
 		}
 		logStream <- parseEntry(entry, labels)

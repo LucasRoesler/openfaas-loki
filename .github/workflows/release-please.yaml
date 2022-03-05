@@ -1,0 +1,28 @@
+on:
+  push:
+    branches:
+      - main
+
+name: release-please
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: GoogleCloudPlatform/release-please-action@v2
+        id: release
+        with:
+          # use the CI token to pretend not to be a action
+          # token: ${{ secrets.CONTIAMO_CI_TOKEN }}
+          release-type: go
+          package-name: ""
+          changelog-types: |
+            [
+              {"type":"feat","section":"Features","hidden":false},
+              {"type":"fix","section":"Bug Fixes","hidden":false},
+              {"type":"chore","section":"Miscellaneous","hidden":false},
+              {"type":"docs","section":"Miscellaneous","hidden":false},
+              {"type":"refactor","section":"Miscellaneous","hidden":false}
+            ]
+      - name: Debug release output
+        run: |
+          echo '${{ toJSON(steps.release.outputs) }}'

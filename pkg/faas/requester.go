@@ -9,13 +9,13 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/sirupsen/logrus"
-
 	"github.com/grafana/loki/pkg/logproto"
 
 	"github.com/LucasRoesler/openfaas-loki/pkg/loki"
 
 	"github.com/openfaas/faas-provider/logs"
+
+	"github.com/rs/zerolog/log"
 )
 
 type lokiRequester struct {
@@ -31,7 +31,7 @@ func New(client loki.Client) logs.Requester {
 
 // Query submits a log request to the actual logging system.
 func (l *lokiRequester) Query(ctx context.Context, req logs.Request) (<-chan logs.Message, error) {
-	log := logrus.WithField("method", "Query").WithField("name", req.Name)
+	logger := log.With().Str("method", "Query").Str("name", req.Name).Logger()
 
 	queryReq := l.buildRequest(req)
 	resp, err := l.client.Query(ctx, queryReq)
@@ -42,7 +42,7 @@ func (l *lokiRequester) Query(ctx context.Context, req logs.Request) (<-chan log
 	var wg sync.WaitGroup
 	logStream := make(chan logs.Message, 100)
 	for _, stream := range resp.Streams {
-		log.Debug("starting stream")
+		logger.Debug().Msg("starting stream")
 		wg.Add(1)
 		go func(s logproto.Stream) {
 			defer wg.Done()
@@ -53,7 +53,7 @@ func (l *lokiRequester) Query(ctx context.Context, req logs.Request) (<-chan log
 
 	go func() {
 		wg.Wait()
-		log.Debug("all streams closed")
+		logger.Debug().Msg("all streams closed")
 		close(logStream)
 	}()
 
@@ -74,17 +74,17 @@ func (l *lokiRequester) buildRequest(logReq logs.Request) (req logproto.QueryReq
 	} else {
 		req.Selector = fmt.Sprintf("{faas_function=\"%s\"}", logReq.Name)
 	}
-	logrus.WithField("method", "buildRequest").Debugf("%v => %v", logReq, req)
+	log.Debug().Str("method", "buildRequest").Msgf("%v => %v", logReq, req)
 	return req
 }
 
 // sendEntries will parse the stream entries and push them into the log stream channel
 func (l *lokiRequester) sendEntries(ctx context.Context, logStream chan logs.Message, stream logproto.Stream) {
-	log := logrus.WithField("method", "sendEntries")
+	logger := log.With().Str("method", "sendEntries").Logger()
 	labels := parseLabels(stream.Labels)
 	for _, entry := range stream.Entries {
 		if ctx.Err() != nil {
-			log.Debug("context canceled, stopping stream")
+			logger.Debug().Msg("context canceled, stopping stream")
 			return
 		}
 		logStream <- parseEntry(entry, labels)
@@ -96,8 +96,8 @@ func (l *lokiRequester) sendEntries(ctx context.Context, logStream chan logs.Mes
 // because this is currently the format sen back by Loki
 // parsing errors are quiently skipped
 func parseLabels(value string) map[string]string {
-	log := logrus.WithField("method", "parseLabels")
-	log.Debug(value)
+	logger := log.With().Str("method", "parseLabels").Logger()
+	logger.Debug().Msg(value)
 	parsed := map[string]string{}
 
 	labelCSV := strings.Trim(value, "{}")
@@ -105,13 +105,13 @@ func parseLabels(value string) map[string]string {
 	for _, label := range labels {
 		parts := strings.SplitN(strings.TrimSpace(label), "=", 2)
 		if len(parts) != 2 {
-			log.WithField("label", label).Error("unexpected number of label parts")
+			logger.Error().Str("label", label).Msg("unexpected number of label parts")
 			continue
 		}
 
 		value, err := strconv.Unquote(parts[1])
 		if err != nil {
-			log.WithField("label", label).Error(errors.Wrap(err, "failed to unquote label value"))
+			logger.Error().Str("label", label).Err(errors.Wrap(err, "failed to unquote label value")).Send()
 			continue
 		}
 		parsed[parts[0]] = value

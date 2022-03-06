@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/sirupsen/logrus"
+	"github.com/rs/zerolog"
 
 	"github.com/pkg/errors"
 
@@ -30,7 +30,7 @@ func Test_QueryErrorIsPropagated(t *testing.T) {
 func Test_QueryWithInvalidLabels(t *testing.T) {
 	ctx := context.Background()
 
-	logrus.SetLevel(logrus.DebugLevel)
+	zerolog.SetGlobalLevel(zerolog.DebugLevel)
 
 	now := time.Now()
 	lokiClient := mockLokiClient{
@@ -57,7 +57,7 @@ func Test_QueryWithInvalidLabels(t *testing.T) {
 func Test_QueryHappyPath(t *testing.T) {
 	ctx := context.Background()
 
-	logrus.SetLevel(logrus.DebugLevel)
+	zerolog.SetGlobalLevel(zerolog.DebugLevel)
 
 	now := time.Now()
 	lokiClient := mockLokiClient{

@@ -2,4 +2,4 @@ bin
 *~
 .vscode/
 dist
-charts/*.tgz
+openfaas-loki-*.tgz

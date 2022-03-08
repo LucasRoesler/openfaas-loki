@@ -45,6 +45,12 @@ jobs:
           echo ::set-output name=repo_owner::$(echo ${{ github.repository_owner }} |
           tr '[:upper:]' '[:lower:]')
 
+      - name: Semver 2
+        id: semver
+        # remove optional v prefix
+        run: >
+          echo ::set-output name=value::$(echo ${{ github.ref }} | sed -E 's/.*v?([0-9]+\.[0-9]+\.[0-9]+).*/\1/')
+
       - name: Docker meta
         id: docker_meta
         uses: docker/metadata-action@v3
@@ -79,3 +85,17 @@ jobs:
           tags: |
             ${{ env.registry }}/${{ steps.get_repo_owner.outputs.repo_owner }}/${{ env.name}}:${{ steps.metadata.outputs.semver }}
             ${{ env.registry }}/${{ steps.get_repo_owner.outputs.repo_owner }}/${{ env.name}}:latest
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v1
+
+      - name: Helm Package
+        # make sure to use the semver output set for the version, helm does not want a "v" prefix
+        run: helm package charts/openfaas-loki --version=${{ steps.semver.outputs.value }} --app-version=${{ steps.metadata.outputs.semver }}
+
+      - name: upload artifacts
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
+          files: |
+            openfaas-loki-${{ steps.semver.outputs.value }}.tgz

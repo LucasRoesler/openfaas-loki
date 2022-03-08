@@ -4,13 +4,15 @@
 
 replicaCount: 1
 
+# -- required
 lokiURL: ""
 logLevel: INFO
 timeout: 30s
 
 image:
   repository: ghcr.io/lucasroesler/openfaas-loki
-  tag: "" # will default to Chart.appVersion
+  # -- will default to Chart.appVersion
+  tag: ""
   pullPolicy: Always
 
 service:
@@ -32,7 +34,7 @@ resources:
   #  cpu: 100m
   #  memory: 128Mi
 
-annotations: []
+annotations: {}
 
 nodeSelector: {}
 

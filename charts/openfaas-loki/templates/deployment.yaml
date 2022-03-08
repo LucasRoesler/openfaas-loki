@@ -30,7 +30,7 @@ spec:
             runAsUser: 10001
           env:
             - name: OF_LOKI_URL
-              value: {{ .Values.lokiURL | quote }}
+              value: {{ required "A lokiURL must be entered"  .Values.lokiURL | quote }}
             - name: OF_LOKI_LOG_LEVEL
               value: {{ .Values.logLevel | quote }}
             - name: OF_LOKI_TIMEOUT

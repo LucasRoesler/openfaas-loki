@@ -73,7 +73,7 @@ func (l *lokiRequester) buildRequest(logReq logs.Request) (req logproto.QueryReq
 	} else {
 		req.Selector = fmt.Sprintf("{faas_function=\"%s\"}", logReq.Name)
 	}
-	slog.LogAttrs(nil, slog.LevelDebug, "buildRequest", slog.Any("request", logReq), slog.Any("lokiRequest", req))
+	slog.LogAttrs(context.TODO(), slog.LevelDebug, "buildRequest", slog.Any("request", logReq), slog.Any("lokiRequest", req))
 	return req
 }
 
@@ -96,7 +96,7 @@ func (l *lokiRequester) sendEntries(ctx context.Context, logStream chan logs.Mes
 // parsing errors are quiently skipped
 func parseLabels(value string) map[string]string {
 	logger := slog.With("method", "parseLabels")
-	logger.LogAttrs(nil, slog.LevelDebug, value)
+	logger.LogAttrs(context.TODO(), slog.LevelDebug, value)
 
 	parsed := map[string]string{}
 
@@ -105,13 +105,13 @@ func parseLabels(value string) map[string]string {
 	for _, label := range labels {
 		parts := strings.SplitN(strings.TrimSpace(label), "=", 2)
 		if len(parts) != 2 {
-			logger.LogAttrs(nil, slog.LevelError, "unexpected number of label parts", slog.String("label", label))
+			logger.LogAttrs(context.TODO(), slog.LevelError, "unexpected number of label parts", slog.String("label", label))
 			continue
 		}
 
 		value, err := strconv.Unquote(parts[1])
 		if err != nil {
-			logger.LogAttrs(nil, slog.LevelError, "failed to unquote label value", slog.String("label", label), slog.String("err", err.Error()))
+			logger.LogAttrs(context.TODO(), slog.LevelError, "failed to unquote label value", slog.String("label", label), slog.String("err", err.Error()))
 			continue
 		}
 		parsed[parts[0]] = value

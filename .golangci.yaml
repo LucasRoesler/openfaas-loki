@@ -143,7 +143,7 @@ linters-settings:
 
   unused:
     # Select the Go version to target. The default is '1.13'.
-    go: "1.16"
+    go: "1.21"
 
   whitespace:
     multi-if: true # Enforces newlines (or comments) after every multi-line if statement
@@ -169,17 +169,14 @@ linters:
   enable:
     # Find the whole list here https://golangci-lint.run/usage/linters/
     #
-    - deadcode # finds unused code
     - errcheck # checking for unchecked errors in go programs
     - exhaustive # checking for missing cases in switch statements
     - gosimple # linter for Go source code that specializes in simplifying a code
     - govet # Vet examines Go source code and reports suspicious constructs, such as Printf calls whose arguments do not align with the format string
     - ineffassign # detects when assignments to existing variables are not used
     - staticcheck # Staticcheck is a go vet on steroids, applying a ton of static analysis checks
-    - structcheck # finds unused struct fields
     - typecheck # Like the front-end of a Go compiler, parses and type-checks Go code
     - unused # checks Go code for unused constants, variables, functions and types
-    - varcheck # Finds unused global variables and constants
     - asciicheck # simple linter to check that your code does not contain non-ASCII identifiers
     - bodyclose # checks whether HTTP response body is closed successfully
     - durationcheck # check for two durations multiplied together

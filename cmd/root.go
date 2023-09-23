@@ -64,8 +64,9 @@ var rootCmd = &cobra.Command{
 		routes.Get("/system/logs", logs.NewLogHandlerFunc(requester, viper.GetDuration("timeout")))
 
 		srv := http.Server{
-			Addr:    ":" + viper.GetString("port"),
-			Handler: routes,
+			Addr:              ":" + viper.GetString("port"),
+			ReadHeaderTimeout: time.Second * 3,
+			Handler:           routes,
 		}
 
 		idleConnsClosed := make(chan struct{})

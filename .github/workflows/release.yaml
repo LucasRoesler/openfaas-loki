@@ -35,6 +35,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+
+      - name: Prep binaries
+        run: |
+          mv dist/openfaas-loki_linux_amd64_v1 dist/openfaas-loki_linux_amd64
+
       - name: Get metadata
         id: metadata
         uses: contiamo/git-metadata-action@main

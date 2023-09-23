@@ -59,6 +59,7 @@ install: ${GOBINS}/${NAME}
 
 dist: $(GORELEASER) $(shell find . -name '*.go') go.*
 	$(GORELEASER) build --skip-validate --rm-dist
+	mv dist/openfaas-loki_linux_amd64_v1 dist/openfaas-loki_linux_amd64
 
 
 ARCH:=linux/amd64

@@ -101,5 +101,10 @@ type responseWriterCloseNotifer struct {
 
 func (rw *responseWriterCloseNotifer) CloseNotify() <-chan bool {
 	//nolint:staticcheck // we need to update the log provider before we can remove this.
-	return rw.ResponseWriter.(http.CloseNotifier).CloseNotify()
+	cn, ok := rw.ResponseWriter.(http.CloseNotifier)
+	if !ok {
+		return nil
+	}
+
+	return cn.CloseNotify()
 }

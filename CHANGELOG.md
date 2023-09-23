@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.7.2](https://github.com/LucasRoesler/openfaas-loki/compare/v1.7.1...v1.7.2) (2023-09-23)
+
+
+### Miscellaneous
+
+* release 1.7.2 ([68798ff](https://github.com/LucasRoesler/openfaas-loki/commit/68798ffdd3db3388256247d989b384bbf39f05c7))
+
 ## [1.7.1](https://github.com/LucasRoesler/openfaas-loki/compare/v1.7.0...v1.7.1) (2023-09-23)
 
 

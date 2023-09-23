@@ -3,21 +3,19 @@ package cmd
 import (
 	"context"
 	"errors"
-	"fmt"
+	"log"
+	"log/slog"
 	"net/http"
 	"os"
 	"os/signal"
 	"strings"
 	"time"
 
-	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/log"
-
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"github.com/go-chi/chi"
-	"github.com/go-chi/chi/middleware"
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 
 	"github.com/LucasRoesler/openfaas-loki/pkg"
 	"github.com/LucasRoesler/openfaas-loki/pkg/faas"
@@ -51,7 +49,9 @@ var rootCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		configureLogging()
 
-		log.Debug().Interface("config", viper.AllSettings()).Msg("configuration")
+		logger := slog.Default()
+
+		logger.Debug("starting", slog.Any("config", viper.AllSettings()))
 
 		client := loki.New(viper.GetString("url"))
 		requester := faas.New(client)
@@ -81,48 +81,47 @@ var rootCmd = &cobra.Command{
 			err := srv.Shutdown(ctx)
 			if err != nil {
 				// Error from closing listeners, or context timeout:
-				log.Printf("server Shutdown: %v\n", err)
+				logger.Info("shutting down", slog.Any("error", err.Error()))
 			}
 			close(idleConnsClosed)
 		}()
 
-		log.Printf("starting server at %v\n", srv.Addr)
+		logger.Info("starting server", "address", srv.Addr)
 		err := srv.ListenAndServe()
 		if !errors.Is(err, http.ErrServerClosed) {
 			// Error starting or closing listener:
-			log.Error().Err(err).Send()
+			logger.Error("listening error", slog.Any("error", err.Error()))
 		}
 
 		<-idleConnsClosed
-		log.Print("server Stopped")
+		logger.Info("server Stopped")
 	},
 }
 
 func configureLogging() {
-	lvl, err := zerolog.ParseLevel(viper.GetString("log-level"))
+	lvl := new(slog.LevelVar)
+	lvl.Set(slog.LevelInfo)
+
+	err := lvl.UnmarshalText([]byte(viper.GetString("log-level")))
 	if err != nil {
-		log.Fatal().Err(err).Send()
+		log.Fatal(err)
 	}
-	zerolog.SetGlobalLevel(lvl)
 
-	if viper.GetString("log-fmt") == "logfmt" {
-		setLogFormat()
+	opts := &slog.HandlerOptions{
+		Level: lvl,
 	}
-}
 
-// SetLogFormat configures the looger to use logfmt formatting.
-func setLogFormat() {
-	output := zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: time.RFC3339}
-	output.FormatLevel = func(i interface{}) string {
-		return strings.ToUpper(fmt.Sprintf("%s", i))
+	switch viper.GetString("log-fmt") {
+	case "json":
+		slog.SetDefault(slog.New(slog.NewJSONHandler(os.Stderr, opts)))
+	default:
+		slog.SetDefault(slog.New(slog.NewTextHandler(os.Stderr, opts)))
 	}
-	log.Logger = log.Output(output)
-	zerolog.DurationFieldUnit = time.Second
 }
 
 // Execute starts the openfaas-loki server
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
-		log.Fatal().Err(err).Send()
+		log.Fatal(err)
 	}
 }

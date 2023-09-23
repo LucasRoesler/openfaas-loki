@@ -7,8 +7,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/rs/zerolog"
-
 	"github.com/pkg/errors"
 
 	"github.com/stretchr/testify/require"
@@ -29,8 +27,6 @@ func Test_QueryErrorIsPropagated(t *testing.T) {
 
 func Test_QueryWithInvalidLabels(t *testing.T) {
 	ctx := context.Background()
-
-	zerolog.SetGlobalLevel(zerolog.DebugLevel)
 
 	now := time.Now()
 	lokiClient := mockLokiClient{
@@ -56,8 +52,6 @@ func Test_QueryWithInvalidLabels(t *testing.T) {
 
 func Test_QueryHappyPath(t *testing.T) {
 	ctx := context.Background()
-
-	zerolog.SetGlobalLevel(zerolog.DebugLevel)
 
 	now := time.Now()
 	lokiClient := mockLokiClient{

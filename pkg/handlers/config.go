@@ -2,10 +2,10 @@ package handlers
 
 import (
 	"encoding/json"
+	"log/slog"
 	"net/http"
 
 	"github.com/LucasRoesler/openfaas-loki/pkg"
-	"github.com/rs/zerolog/log"
 
 	"github.com/spf13/viper"
 )
@@ -24,6 +24,6 @@ func ConfigHandlerFunc(w http.ResponseWriter, r *http.Request) {
 
 	_, err = w.Write(bytes)
 	if err != nil {
-		log.Error().Err(err).Msg("can not write config")
+		slog.Default().LogAttrs(r.Context(), slog.LevelError, "can not write config", slog.String("err", err.Error()))
 	}
 }

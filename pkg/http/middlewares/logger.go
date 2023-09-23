@@ -1,10 +1,9 @@
 package middlewares
 
 import (
+	"log/slog"
 	"net/http"
 	"time"
-
-	"github.com/rs/zerolog/log"
 )
 
 // RequestLogger returns a logger handler using a custom LogFormatter.
@@ -25,13 +24,15 @@ func RequestLogger(skipList []string) func(next http.Handler) http.Handler {
 
 			t1 := time.Now()
 			defer func() {
-				log.Info().
-					Str("method", r.Method).
-					Str("url", r.URL.String()).
-					Int("status", ww.Status()).
-					Dur("duration", time.Since(t1)).
-					Int("size", ww.Size()).
-					Msg("request finished")
+				slog.Default().LogAttrs(
+					r.Context(),
+					slog.LevelInfo, "request finished",
+					slog.String("method", r.Method),
+					slog.String("url", r.URL.String()),
+					slog.Int("status", ww.Status()),
+					slog.Int("size", ww.Size()),
+					slog.Duration("duration", time.Since(t1)),
+				)
 			}()
 
 			next.ServeHTTP(ww, r)

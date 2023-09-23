@@ -8,8 +8,9 @@ import (
 	"net/url"
 	"strconv"
 
+	log "log/slog"
+
 	"github.com/pkg/errors"
-	"github.com/rs/zerolog/log"
 
 	"github.com/grafana/loki/pkg/logproto"
 )
@@ -40,7 +41,7 @@ func New(base string) Client {
 }
 
 func (c *httpClient) Query(ctx context.Context, req logproto.QueryRequest) (*logproto.QueryResponse, error) {
-	params := requestAsQueryParms(req)
+	params := requestAsQueryParams(req)
 	path := fmt.Sprintf(queryPath, params.Encode())
 
 	var resp logproto.QueryResponse
@@ -53,7 +54,7 @@ func (c *httpClient) Query(ctx context.Context, req logproto.QueryRequest) (*log
 }
 
 func (c *httpClient) doRequest(ctx context.Context, path string, out interface{}) error {
-	logger := log.With().Str("method", "doRequest").Logger()
+	logger := log.Default().With("method", "doRequest")
 
 	req, err := http.NewRequest("GET", c.lokiBaseURL+path, nil)
 	if err != nil {
@@ -61,7 +62,7 @@ func (c *httpClient) doRequest(ctx context.Context, path string, out interface{}
 	}
 	req = req.WithContext(ctx)
 
-	logger.Debug().Msg(req.URL.String())
+	logger.Debug(req.URL.String())
 
 	resp, err := c.parent.Do(req)
 	if err != nil {
@@ -70,7 +71,7 @@ func (c *httpClient) doRequest(ctx context.Context, path string, out interface{}
 	defer func() {
 		err := resp.Body.Close()
 		if err != nil {
-			logger.Error().Err(err).Msg("error closing body")
+			logger.Error("error closing body", "error", err)
 		}
 	}()
 
@@ -85,7 +86,7 @@ func isOK(s int) bool {
 	return s/100 == 2
 }
 
-func requestAsQueryParms(req logproto.QueryRequest) (params url.Values) {
+func requestAsQueryParams(req logproto.QueryRequest) (params url.Values) {
 	params = url.Values{}
 	params.Add("query", req.Selector)
 	params.Add("direction", req.GetDirection().String())

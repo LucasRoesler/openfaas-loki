@@ -3,6 +3,7 @@ package faas
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"strconv"
 	"strings"
 	"sync"
@@ -14,8 +15,6 @@ import (
 	"github.com/LucasRoesler/openfaas-loki/pkg/loki"
 
 	"github.com/openfaas/faas-provider/logs"
-
-	"github.com/rs/zerolog/log"
 )
 
 type lokiRequester struct {
@@ -31,7 +30,7 @@ func New(client loki.Client) logs.Requester {
 
 // Query submits a log request to the actual logging system.
 func (l *lokiRequester) Query(ctx context.Context, req logs.Request) (<-chan logs.Message, error) {
-	logger := log.With().Str("method", "Query").Str("name", req.Name).Logger()
+	logger := slog.Default().With("method", "Query").With("name", req.Name)
 
 	queryReq := l.buildRequest(req)
 	resp, err := l.client.Query(ctx, queryReq)
@@ -42,7 +41,7 @@ func (l *lokiRequester) Query(ctx context.Context, req logs.Request) (<-chan log
 	var wg sync.WaitGroup
 	logStream := make(chan logs.Message, 100)
 	for _, stream := range resp.Streams {
-		logger.Debug().Msg("starting stream")
+		logger.LogAttrs(ctx, slog.LevelDebug, "starting stream")
 		wg.Add(1)
 		go func(s logproto.Stream) {
 			defer wg.Done()
@@ -53,7 +52,7 @@ func (l *lokiRequester) Query(ctx context.Context, req logs.Request) (<-chan log
 
 	go func() {
 		wg.Wait()
-		logger.Debug().Msg("all streams closed")
+		logger.LogAttrs(ctx, slog.LevelDebug, "all streams closed")
 		close(logStream)
 	}()
 
@@ -74,17 +73,17 @@ func (l *lokiRequester) buildRequest(logReq logs.Request) (req logproto.QueryReq
 	} else {
 		req.Selector = fmt.Sprintf("{faas_function=\"%s\"}", logReq.Name)
 	}
-	log.Debug().Str("method", "buildRequest").Msgf("%v => %v", logReq, req)
+	slog.LogAttrs(nil, slog.LevelDebug, "buildRequest", slog.Any("request", logReq), slog.Any("lokiRequest", req))
 	return req
 }
 
 // sendEntries will parse the stream entries and push them into the log stream channel
 func (l *lokiRequester) sendEntries(ctx context.Context, logStream chan logs.Message, stream logproto.Stream) {
-	logger := log.With().Str("method", "sendEntries").Logger()
+	logger := slog.Default().With("method", "sendEntries")
 	labels := parseLabels(stream.Labels)
 	for _, entry := range stream.Entries {
 		if ctx.Err() != nil {
-			logger.Debug().Msg("context canceled, stopping stream")
+			logger.LogAttrs(ctx, slog.LevelDebug, "context canceled, stopping stream")
 			return
 		}
 		logStream <- parseEntry(entry, labels)
@@ -96,8 +95,9 @@ func (l *lokiRequester) sendEntries(ctx context.Context, logStream chan logs.Mes
 // because this is currently the format sen back by Loki
 // parsing errors are quiently skipped
 func parseLabels(value string) map[string]string {
-	logger := log.With().Str("method", "parseLabels").Logger()
-	logger.Debug().Msg(value)
+	logger := slog.With("method", "parseLabels")
+	logger.LogAttrs(nil, slog.LevelDebug, value)
+
 	parsed := map[string]string{}
 
 	labelCSV := strings.Trim(value, "{}")
@@ -105,13 +105,13 @@ func parseLabels(value string) map[string]string {
 	for _, label := range labels {
 		parts := strings.SplitN(strings.TrimSpace(label), "=", 2)
 		if len(parts) != 2 {
-			logger.Error().Str("label", label).Msg("unexpected number of label parts")
+			logger.LogAttrs(nil, slog.LevelError, "unexpected number of label parts", slog.String("label", label))
 			continue
 		}
 
 		value, err := strconv.Unquote(parts[1])
 		if err != nil {
-			logger.Error().Str("label", label).Err(errors.Wrap(err, "failed to unquote label value")).Send()
+			logger.LogAttrs(nil, slog.LevelError, "failed to unquote label value", slog.String("label", label), slog.String("err", err.Error()))
 			continue
 		}
 		parsed[parts[0]] = value

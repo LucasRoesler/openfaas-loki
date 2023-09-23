@@ -1,5 +1,39 @@
 # Changelog
 
+## [1.7.0](https://github.com/LucasRoesler/openfaas-loki/compare/v1.6.0...v1.7.0) (2023-09-23)
+
+
+### Features
+
+* upgrade to go 1.21 and switch to slog ([a377237](https://github.com/LucasRoesler/openfaas-loki/commit/a377237dfb0dd8e1a29319de7b614248dd1cbbf9))
+
+
+### Bug Fixes
+
+* update dev tools and fix linting errors ([7ce6849](https://github.com/LucasRoesler/openfaas-loki/commit/7ce684961f4b54b67ab91506e8321ab2314d1292))
+
+
+### Miscellaneous
+
+* bump azure/setup-helm from 1 to 3 ([#40](https://github.com/LucasRoesler/openfaas-loki/issues/40)) ([0a76b00](https://github.com/LucasRoesler/openfaas-loki/commit/0a76b008e30c576968043899010f58f8318de212))
+* bump docker/build-push-action from 2 to 5 ([#61](https://github.com/LucasRoesler/openfaas-loki/issues/61)) ([4eff495](https://github.com/LucasRoesler/openfaas-loki/commit/4eff4951d2d1b155ee1f1b2d2964e17cf6362690))
+* bump docker/login-action from 1 to 3 ([#59](https://github.com/LucasRoesler/openfaas-loki/issues/59)) ([6f8590a](https://github.com/LucasRoesler/openfaas-loki/commit/6f8590a8c72e065c29474449400e81be5ffd67d8))
+* bump docker/metadata-action from 3 to 5 ([#60](https://github.com/LucasRoesler/openfaas-loki/issues/60)) ([0720400](https://github.com/LucasRoesler/openfaas-loki/commit/072040005c41d46e0f9e721171f9c52db18b5909))
+* bump docker/setup-qemu-action from 1 to 3 ([#58](https://github.com/LucasRoesler/openfaas-loki/issues/58)) ([46acb42](https://github.com/LucasRoesler/openfaas-loki/commit/46acb425feb20b024843f46f79980bac76374bec))
+* Update repo add instructions ([e5aeb8c](https://github.com/LucasRoesler/openfaas-loki/commit/e5aeb8c8b2c5afd24665a430debdfcb1c195ca21))
+
+
+### Automations
+
+* add missing permission for release-please ([68ea751](https://github.com/LucasRoesler/openfaas-loki/commit/68ea7516feb037a8169634e353cb713e133f1826))
+* bump actions/checkout from 2 to 4 ([#64](https://github.com/LucasRoesler/openfaas-loki/issues/64)) ([a15f6c9](https://github.com/LucasRoesler/openfaas-loki/commit/a15f6c93e8d62a173be3f1990bb5fab1efdcf70d))
+* bump actions/setup-go from 3 to 4 ([#63](https://github.com/LucasRoesler/openfaas-loki/issues/63)) ([5146af5](https://github.com/LucasRoesler/openfaas-loki/commit/5146af58540beb48a8e2b4022db0485db2904612))
+* bump docker/setup-buildx-action from 1 to 3 ([#65](https://github.com/LucasRoesler/openfaas-loki/issues/65)) ([14c6931](https://github.com/LucasRoesler/openfaas-loki/commit/14c6931d8a43eeb82d8277c8b087bba4a137edc9))
+* bump goreleaser/goreleaser-action from 2 to 5 ([#66](https://github.com/LucasRoesler/openfaas-loki/issues/66)) ([f250a50](https://github.com/LucasRoesler/openfaas-loki/commit/f250a5032e36685f2e8ac7f1461a2f66806fc194))
+* fix golangci-lint-action version ([8086e23](https://github.com/LucasRoesler/openfaas-loki/commit/8086e232ff5435e8f23d88b3d0babd9db327f3d5))
+* update dependabot settings for actions ([3e879b0](https://github.com/LucasRoesler/openfaas-loki/commit/3e879b0b557c316d5cb67a2cc183f17a4eee5270))
+* update release flow to push OCI helm charts ([7492502](https://github.com/LucasRoesler/openfaas-loki/commit/7492502ae8a0de7b7004ac8625a43fc7b9177ad2))
+
 ## [1.6.0](https://github.com/LucasRoesler/openfaas-loki/compare/v1.5.0...v1.6.0) (2022-03-08)
 
 

@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.7.1](https://github.com/LucasRoesler/openfaas-loki/compare/v1.7.0...v1.7.1) (2023-09-23)
+
+
+### Bug Fixes
+
+* handle go 1.18 amd versioning during builds ([3cc3b33](https://github.com/LucasRoesler/openfaas-loki/commit/3cc3b3318e9567f455b4fb47e4ee39c5d1405252))
+
 ## [1.7.0](https://github.com/LucasRoesler/openfaas-loki/compare/v1.6.0...v1.7.0) (2023-09-23)
 
 

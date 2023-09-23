@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.7.4](https://github.com/LucasRoesler/openfaas-loki/compare/v1.7.3...v1.7.4) (2023-09-23)
+
+
+### Miscellaneous
+
+* update installation instructions ([58c5bba](https://github.com/LucasRoesler/openfaas-loki/commit/58c5bbae9e599ed18b00aa1a9d29a4db077080b9))
+
 ## [1.7.3](https://github.com/LucasRoesler/openfaas-loki/compare/v1.7.2...v1.7.3) (2023-09-23)
 
 

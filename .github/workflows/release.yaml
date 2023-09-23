@@ -93,6 +93,9 @@ jobs:
         # make sure to use the semver output set for the version, helm does not want a "v" prefix
         run: helm package charts/openfaas-loki --version=${{ steps.semver.outputs.value }} --app-version=${{ steps.metadata.outputs.semver }}
 
+      - name: Helm Push
+        run: helm push openfaas-loki-${{ steps.semver.outputs.value }}.tgz oci://ghcr.io/${{ steps.get_repo_owner.outputs.repo_owner }}/charts
+
       - name: upload artifacts
         uses: softprops/action-gh-release@v1
         with:

@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.7.3](https://github.com/LucasRoesler/openfaas-loki/compare/v1.7.2...v1.7.3) (2023-09-23)
+
+
+### Bug Fixes
+
+* use the releaser token instead of the default ([0cefe7c](https://github.com/LucasRoesler/openfaas-loki/commit/0cefe7c761c77eabb46ab0698e876b53ac7f125a))
+
 ## [1.7.2](https://github.com/LucasRoesler/openfaas-loki/compare/v1.7.1...v1.7.2) (2023-09-23)
 
 

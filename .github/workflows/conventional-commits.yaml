@@ -14,7 +14,7 @@ jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/github-script@v6
+      - uses: actions/github-script@v7
         env:
           # Ensure pull request titles match the Conventional Commits specification
           # https://www.conventionalcommits.org/en/v1.0.0/

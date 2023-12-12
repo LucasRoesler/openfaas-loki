@@ -5,7 +5,7 @@ go 1.21
 require (
 	github.com/go-chi/chi/v5 v5.0.10
 	github.com/grafana/loki v1.6.1
-	github.com/openfaas/faas-provider v0.24.2
+	github.com/openfaas/faas-provider v0.25.0
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/cobra v1.7.0
 	github.com/spf13/viper v1.17.0
@@ -16,6 +16,7 @@ require (
 	github.com/cespare/xxhash v1.1.0 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
+	github.com/go-logfmt/logfmt v0.5.1 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect

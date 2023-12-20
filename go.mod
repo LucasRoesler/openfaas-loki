@@ -3,7 +3,7 @@ module github.com/LucasRoesler/openfaas-loki
 go 1.21
 
 require (
-	github.com/go-chi/chi/v5 v5.0.10
+	github.com/go-chi/chi/v5 v5.0.11
 	github.com/grafana/loki v1.6.1
 	github.com/openfaas/faas-provider v0.24.2
 	github.com/pkg/errors v0.9.1
